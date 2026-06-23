@@ -17,7 +17,7 @@
                 @csrf
                 <div class="mb-3">
                     <label class="form-label">Student Number</label>
-                    <input type="text" name="student_number" class="form-control" placeholder="example@gmail.com" value="{{ old('student_number') }}" required>
+                    <input type="text" name="student_number" class="form-control" value="{{ old('student_number') }}" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Full Name</label>
