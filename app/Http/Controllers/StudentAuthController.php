@@ -18,11 +18,16 @@ class StudentAuthController extends Controller
     public function register(Request $request)
     {
         // Validation
-        $request->validate([
+       $request->validate([
             'student_number' => ['required', 'string', 'max:50', 'unique:students,student_number'],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:students,email'],
-            'password' => ['required', 'string', 'min:6', 'confirmed'],
+            'password' => [
+                'required','string', 'min:8', 'regex:/[A-Z]/', 'regex:/[@$!%*#?&]/', 'confirmed'
+            ],
+        ], [
+            'password.min' => 'Password must be at least 8 characters long.',
+            'password.regex' => 'Password must contain at least one uppercase letter and one special character.',
         ]);
 
         // Create student
