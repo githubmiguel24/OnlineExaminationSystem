@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\StudentAuthController;
 use App\Http\Controllers\StudentExamController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QuestionBankController;
@@ -11,15 +10,15 @@ Route::get('/', [AuthController::class, 'showWelcome'])->name('welcome');
 Route::group(['prefix' => 'user'], function () {
 
     Route::get('/register', [AuthController::class, 'showRegister'])->name('studentAuth.register');
-    Route::post('/register', [StudentAuthController::class, 'register'])->name('studentAuth.register.submit');
-    Route::get('/login', [StudentAuthController::class, 'showLogin'])->name('studentAuth.login');
-    Route::post('/login', [StudentAuthController::class, 'login'])->name('studentAuth.login.submit');
-    Route::get('/forgot-password', [StudentAuthController::class, 'showForgotPassword'])->name('studentAuth.forgotPassword');
-    Route::post('/forgot-password', [StudentAuthController::class, 'forgotPassword'])->name('studentAuth.forgotPassword.submit');
+    Route::post('/register', [AuthController::class, 'register'])->name('studentAuth.register.submit');
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('studentAuth.login');
+    Route::post('/login', [AuthController::class, 'login'])->name('studentAuth.login.submit');
+    Route::get('/forgot-password', [authController::class, 'showForgotPassword'])->name('studentAuth.forgotPassword');
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('studentAuth.forgotPassword.submit');
 
     Route::group(['middleware' => 'check.student.auth'], function () {
-        Route::get('/dashboard', [StudentAuthController::class, 'dashboard'])->name('studentAuth.dashboard');
-        Route::post('/logout', [StudentAuthController::class, 'logout'])->name('studentAuth.logout');
+        Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('studentAuth.dashboard');
+        Route::post('/logout', [AuthController::class, 'logout'])->name('studentAuth.logout');
     });
 });
 
