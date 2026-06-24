@@ -130,7 +130,7 @@ class AuthController extends Controller
         ]);
 
         $teacherId = DB::table('users_table')->insertGetId([
-            'role_id' => 1, // Added missing role_id (1 = Teacher)
+            'role_id' => 1, 
             'full_name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),

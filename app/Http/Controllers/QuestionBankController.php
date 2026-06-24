@@ -7,57 +7,53 @@ use Illuminate\Support\Facades\DB;
 
 class QuestionBankController extends Controller
 {
-    public function index(Request $request)
+    // Show the Create Question Form
+    public function create()
     {
-        // Fetch all subjects for the dropdown form selectors
-        $subjects = DB::table('subjects')->get();
-
-        // Start our query builder with a leftJoin to pull subject details
-        $query = DB::table('questions')
-            ->leftJoin('subjects', 'questions.subject_id', '=', 'subjects.id')
-            ->select('questions.*', 'subjects.name as subject_name');
-
-        // UX Feature: If a subject filter is picked from the dropdown, narrow down results
-        if ($request->has('subject_filter') && $request->subject_filter != '') {
-            $query->where('questions.subject_id', '=', $request->subject_filter);
-        }
-
-        $questions = $query->get();
-
-        return view('questions.index', compact('questions', 'subjects'));
+        // Fetch subjects so the teacher can assign the question to a subject
+        $subjects = DB::table('subjects_table')->get();
+        
+        return view('teacher-auth.create-question', compact('subjects'));
     }
 
+    // Process the Form Submission
     public function store(Request $request)
     {
-        // 1. Validation rule configuration (Notice: standard arrow notation, no callable parentheses)
+        // 1. Validate the incoming data
         $request->validate([
-            'subject_id'     => ['required'],
-            'question_text'  => ['required'],
-            'option_a'       => ['required'],
-            'option_b'       => ['required'],
-            'option_c'       => ['required'],
-            'option_d'       => ['required'],
-            'correct_option' => ['required']
+            'subject_id' => 'required|integer',
+            'question_text' => 'required|string',
+            'choice_a' => 'required|string',
+            'choice_b' => 'required|string',
+            'choice_c' => 'required|string',
+            'choice_d' => 'required|string',
+            'correct_answer' => 'required|string|in:A,B,C,D',
         ]);
 
-        // 2. Insert into the database
-        DB::table('questions')->insert([
-            'subject_id'     => $request->subject_id,
-            'question_text'  => $request->question_text,
-            'option_a'       => $request->option_a,
-            'option_b'       => $request->option_b,
-            'option_c'       => $request->option_c,
-            'option_d'       => $request->option_d,
-            'correct_option' => $request->correct_option,
-            'created_at'     => now()
+        // 2. Package the choices into a simple JSON array to store in the DB easily
+        $choices = [
+            'A' => $request->choice_a,
+            'B' => $request->choice_b,
+            'C' => $request->choice_c,
+            'D' => $request->choice_d,
+        ];
+
+        // 3. Insert into the database
+        DB::table('question_table')->insert([
+            'subject_id' => $request->subject_id,
+            'quest_desc' => $request->question_text,
+            'quest_choices' => json_encode($choices), // Saves as a JSON string
+            'quest_answer' => $request->correct_answer,
+            'quest_pts' => 1
         ]);
 
-        return redirect()->route('questions.index')->with('success', 'Question added to the bank successfully!');
-    }
+        // 4. Check which button the user clicked using pure PHP
+        if ($request->submit_action === 'add_another') {
+            // Redirect back to the same empty form with a success message
+            return back()->with('success', 'Question saved! You can add another one below.');
+        }
 
-    public function destroy(int $id)
-    {
-        DB::table('questions')->where('id', $id)->delete();
-        return redirect()->route('questions.index')->with('success', 'Question deleted.');
+        // If they clicked "Save and Finish", send them to the dashboard or exam creation page
+        return redirect()->route('teacherAuth.dashboard')->with('success', 'Question saved successfully!');
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ExamController;
 use App\Http\Controllers\StudentExamController;
 use App\Http\Controllers\QuestionBankController;
 use Illuminate\Support\Facades\Route;
@@ -35,22 +36,25 @@ Route::group(['prefix' => 'student-exam', 'middleware' => 'check.student.auth'],
 
 // TEACHER ROUTES
 Route::group(['prefix' => 'teacher'], function () {
+    
     Route::get('/register', [AuthController::class, 'showTeacherRegister'])->name('teacherAuth.register');
     Route::post('/register', [AuthController::class, 'teacherRegister'])->name('teacherAuth.register.submit');
     
     Route::get('/login', [AuthController::class, 'showTeacherLogin'])->name('teacherAuth.login');
     Route::post('/login', [AuthController::class, 'teacherLogin'])->name('teacherAuth.login.submit');
 
-    // Add a check.teacher.auth middleware later just like your student one
     Route::group(['middleware' => 'check.teacher.auth'], function () {
+        
         Route::get('/dashboard', [AuthController::class, 'teacherDashboard'])->name('teacherAuth.dashboard');
         Route::post('/logout', [AuthController::class, 'teacherLogout'])->name('teacherAuth.logout');
         
-        // Question Bank Routes for Teachers
+        Route::get('/exams/create', [ExamController::class, 'create'])->name('exams.create');
+        Route::post('/exams/store', [ExamController::class, 'store'])->name('exams.store');
+        
         Route::group(['prefix' => 'question-bank'], function() {
-            Route::get('/', [QuestionBankController::class, 'index'])->name('questions.index');
+            Route::get('/create', [QuestionBankController::class, 'create'])->name('questions.create');
             Route::post('/store', [QuestionBankController::class, 'store'])->name('questions.store');
-            Route::delete('/delete/{id}', [QuestionBankController::class, 'destroy'])->name('questions.delete');
         });
+        
     });
 });
