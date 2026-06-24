@@ -9,9 +9,7 @@ use Illuminate\Support\Str;
 
 class ExamController extends Controller
 {
-    // ==========================================
-    // PAGE 1: CREATE EXAM & SETTINGS
-    // ==========================================
+    //CREATE EXAM with details
     public function create()
     {
         $subjects = DB::table('subjects_table')->get();
@@ -22,7 +20,6 @@ class ExamController extends Controller
     {
         $teacher = (object) Session::get('teacher');
 
-        // Validation updated to match your exact columns
         $request->validate([
             'title' => 'required|string|max:255',
             'subject_id' => 'required|integer',
@@ -34,7 +31,6 @@ class ExamController extends Controller
 
         $status = $request->has('publish_immediately') ? 'Published' : 'Draft';
 
-        // Insert into exams_table (matches your screenshot exactly)
         $examId = DB::table('exams_table')->insertGetId([
             'user_id' => $teacher->user_id, // Swapped teacher_id to user_id
             'subject_id' => $request->subject_id,
@@ -51,9 +47,6 @@ class ExamController extends Controller
                          ->with('success', 'Exam settings saved! Now add your questions.');
     }
 
-    // ==========================================
-    // PAGE 2: MANAGE QUESTIONS 
-    // ==========================================
     public function manageQuestions($exam_id)
     {
         $exam = DB::table('exams_table')->where('exam_id', $exam_id)->first();
@@ -86,7 +79,6 @@ class ExamController extends Controller
             return back()->withErrors(['questions' => 'No questions were selected.']);
         }
 
-        // ACTION B: Create a brand new question
         if ($action === 'create_new') {
             $exam = DB::table('exams_table')->where('exam_id', $exam_id)->first();
             
@@ -99,7 +91,6 @@ class ExamController extends Controller
                 'correct_answer' => 'required|string|in:A,B,C,D',
             ]);
 
-            // Save to questions_table (Added 's')
             $newQId = DB::table('questions_table')->insertGetId([
                 'subject_id' => $exam->subject_id,
                 'quest_desc' => $request->question_text,
@@ -112,7 +103,6 @@ class ExamController extends Controller
             return back()->with('success', 'New question created and added!');
         }
 
-        // ACTION C: Remove a question
         if ($action === 'remove_question') {
             DB::table('exam_question_table')
                 ->where('exam_id', $exam_id)
