@@ -48,9 +48,13 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::get('/dashboard', [AuthController::class, 'teacherDashboard'])->name('teacherAuth.dashboard');
         Route::post('/logout', [AuthController::class, 'teacherLogout'])->name('teacherAuth.logout');
         
+        // PAGE 1: Create the Exam
         Route::get('/exams/create', [ExamController::class, 'create'])->name('exams.create');
         Route::post('/exams/store', [ExamController::class, 'store'])->name('exams.store');
-        
+
+        // PAGE 2: Manage Questions for that Exam
+        Route::get('/exams/{exam_id}/questions', [ExamController::class, 'manageQuestions'])->name('exams.questions');
+        Route::post('/exams/{exam_id}/questions/action', [ExamController::class, 'handleQuestionAction'])->name('exams.questions.action');
         Route::group(['prefix' => 'question-bank'], function() {
             Route::get('/create', [QuestionBankController::class, 'create'])->name('questions.create');
             Route::post('/store', [QuestionBankController::class, 'store'])->name('questions.store');
