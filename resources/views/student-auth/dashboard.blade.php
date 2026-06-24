@@ -9,7 +9,7 @@
     @endif
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Welcome, {{ $student->name }}!</h2>
+        <h2>Welcome, {{ $student->full_name }}!</h2>
         <form method="POST" action="{{ route('studentAuth.logout') }}">
             @csrf
             <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>

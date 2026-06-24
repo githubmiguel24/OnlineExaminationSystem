@@ -13,7 +13,8 @@ class AuthController extends Controller
     {
         return view('welcome');
     }
-    //STUDENT LOGIN or REGISTER
+
+    // STUDENT LOGIN & REGISTER
     public function showStudentRegister()
     {
         return view('student-auth.register');
@@ -22,20 +23,19 @@ class AuthController extends Controller
     public function studentRegister(Request $request)
     {
         $request->validate([
-            'student_number' => ['required', 'string', 'max:50', 'unique:students,student_number'],
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:students,email'],
+            'name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:255', 'unique:users_table,email'], // Ensure uniqueness
             'password' => ['required', 'string', 'min:6', 'confirmed'],
         ]);
 
-        $studentId = DB::table('students')->insertGetId([
-            'student_number' => $request->student_number,
-            'name' => $request->name,
+        $studentId = DB::table('users_table')->insertGetId([
+            'role_id' => 2, 
+            'full_name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        $student = DB::table('students')->where('id', $studentId)->first();
+        $student = DB::table('users_table')->where('user_id', $studentId)->first();
         Session::put('student', $student);
 
         return redirect()->route('studentAuth.dashboard')->with('success', 'Registration successful. Welcome!');
@@ -53,14 +53,15 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $student = DB::table('students')->where('email', $request->email)->first();
+        $student = DB::table('users_table')->where('email', $request->email)->first();
 
-        if (!$student || !Hash::check($request->password, $student->password)) {
-            return back()->withErrors(['email' => 'Invalid email or password.'])->withInput($request->only('email'));
+        if (!$student || !Hash::check($request->password, $student->password) || $student->role_id != 2) {
+            return back()->withErrors(['email' => 'Invalid email, password, or unauthorized portal access.'])->withInput($request->only('email'));
         }
 
         Session::put('student', $student);
-        return redirect()->route('studentAuth.dashboard')->with('success', 'Welcome back, ' . $student->name . '!');
+        
+        return redirect()->route('studentAuth.dashboard')->with('success', 'Welcome back, ' . $student->full_name . '!');
     }
 
     public function studentLogout(Request $request)
@@ -72,10 +73,12 @@ class AuthController extends Controller
 
     public function studentDashboard()
     {
-        $student = Session::get('student');
-        $totalExams = DB::table('exams')->where('status', 'published')->count();
-        $takenExams = DB::table('student_answers')
-            ->where('student_id', $student->id)
+        $student = (object) Session::get('student');
+        
+        $totalExams = DB::table('exams_table')->count();
+
+        $takenExams = DB::table('student_exam_table')
+            ->where('student_id', $student->user_id) 
             ->distinct()
             ->pluck('exam_id')
             ->count();
@@ -91,28 +94,28 @@ class AuthController extends Controller
     public function forgotPassword(Request $request)
     {
         $request->validate([
-            'student_number' => ['required', 'string'],
             'email' => ['required', 'email'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
         ]);
 
-        $student = DB::table('students')
-            ->where('student_number', $request->student_number)
+        $student = DB::table('users_table')
             ->where('email', $request->email)
+            ->where('role_id', 2) // Ensure they are a student
             ->first();
 
         if (!$student) {
-            return back()->withErrors(['email' => 'No matching student found.'])->withInput($request->only('student_number', 'email'));
+            return back()->withErrors(['email' => 'No matching student account found.'])->withInput($request->only('email'));
         }
 
-        DB::table('students')->where('id', $student->id)->update([
+        // Used user_id
+        DB::table('users_table')->where('user_id', $student->user_id)->update([
             'password' => Hash::make($request->password),
         ]);
 
         return redirect()->route('studentAuth.login')->with('success', 'Password reset. Please log in.');
     }
 
-    //FOR TEACHER LOGIN OR REGISTER
+    //TEACHER LOGIN & REGISTER
     public function showTeacherRegister()
     {
         return view('teacher-auth.register');
@@ -122,17 +125,19 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:teachers,email'], // Assuming teachers table
+            'email' => ['required', 'email', 'max:255', 'unique:users_table,email'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
         ]);
 
-        $teacherId = DB::table('teachers')->insertGetId([
-            'name' => $request->name,
+        $teacherId = DB::table('users_table')->insertGetId([
+            'role_id' => 1, // Added missing role_id (1 = Teacher)
+            'full_name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        $teacher = DB::table('teachers')->where('id', $teacherId)->first();
+        // Used user_id
+        $teacher = DB::table('users_table')->where('user_id', $teacherId)->first();
         Session::put('teacher', $teacher);
 
         return redirect()->route('teacherAuth.dashboard')->with('success', 'Teacher Registration successful.');
@@ -149,17 +154,16 @@ class AuthController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
-        
-        $teacher = DB::table('teachers')
-            ->where('email', $request->email)
-            ->first();
 
-        if (!$teacher || !Hash::check($request->password, $teacher->password)) {
-            return back()->withErrors(['email' => 'Invalid email or password.'])->withInput($request->only('email'));
+        $teacher = DB::table('users_table')->where('email', $request->email)->first();
+
+        if (!$teacher || !Hash::check($request->password, $teacher->password) || $teacher->role_id != 1) {
+            return back()->withErrors(['email' => 'Invalid email, password, or unauthorized portal access.'])->withInput($request->only('email'));
         }
 
         Session::put('teacher', $teacher);
-        return redirect()->route('teacherAuth.dashboard')->with('success', 'Welcome back, ' . $teacher->name . '!');
+        
+        return redirect()->route('teacherAuth.dashboard')->with('success', 'Welcome back, ' . $teacher->full_name . '!');
     }
 
     public function teacherLogout(Request $request)

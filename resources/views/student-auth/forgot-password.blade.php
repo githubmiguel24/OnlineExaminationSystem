@@ -18,10 +18,6 @@
             <form method="POST" action="{{ route('studentAuth.forgotPassword.submit') }}">
                 @csrf
                 <div class="mb-3">
-                    <label class="form-label">Student Number</label>
-                    <input type="text" name="student_number" class="form-control" value="{{ old('student_number') }}" required>
-                </div>
-                <div class="mb-3">
                     <label class="form-label">Email</label>
                     <input type="email" name="email" class="form-control" placeholder="example@gmail.com" value="{{ old('email') }}" required>
                 </div>

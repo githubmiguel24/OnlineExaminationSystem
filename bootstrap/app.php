@@ -12,10 +12,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+        'check.student.auth' => \App\Http\Middleware\CheckStudentAuth::class,
+        'check.teacher.auth' => \App\Http\Middleware\CheckTeacherAuth::class,
+    ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*'),
         );
     })->create();
+
+    
