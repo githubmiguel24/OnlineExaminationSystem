@@ -1,15 +1,16 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentAuthController;
 use App\Http\Controllers\StudentExamController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QuestionBankController;
 
 // Student auth routes
+Route::get('/', [AuthController::class, 'showWelcome'])->name('welcome');
+Route::group(['prefix' => 'user'], function () {
 
-Route::group(['prefix' => 'student-auth'], function () {
-
-    Route::get('/register', [StudentAuthController::class, 'showRegister'])->name('studentAuth.register');
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('studentAuth.register');
     Route::post('/register', [StudentAuthController::class, 'register'])->name('studentAuth.register.submit');
     Route::get('/login', [StudentAuthController::class, 'showLogin'])->name('studentAuth.login');
     Route::post('/login', [StudentAuthController::class, 'login'])->name('studentAuth.login.submit');
