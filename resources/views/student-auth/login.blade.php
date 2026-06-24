@@ -3,9 +3,14 @@
 @section('content')
 
 <div class="container py-5" style="font-family: sans-serif;">
-    <div class="card mx-auto" style="max-width: 450px;">
-        <div class="card-header text-center fw-bold">Student Login</div>
+    <div class="mb-4 text-center">
+        <a href="{{ route('welcome') }}" class="text-decoration-none text-muted">&larr; Back to Portal</a>
+    </div>
+
+    <div class="card mx-auto shadow-sm border-0 p-4" style="max-width: 450px;">
         <div class="card-body">
+            <h3 class="fw-bold mb-2">Welcome back!</h3>
+            <p class="text-muted mb-4">Sign in to access your student account.</p>
 
             @if(session('success'))
                 <div class="alert alert-success text-center">{{ session('success') }}</div>
@@ -22,21 +27,21 @@
             <form method="POST" action="{{ route('studentAuth.login.submit') }}">
                 @csrf
                 <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control" placeholder="example@gmail.com" value="{{ old('email') }}" required>
+                    <label class="form-label fw-bold">Email Address</label>
+                    <input type="email" name="email" class="form-control" placeholder="juan@email.com" value="{{ old('email') }}" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control" required>
+                    <label class="form-label fw-bold">Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <div class="text-end mb-4">
+                    <a href="{{ route('studentAuth.forgotPassword') }}" class="text-decoration-none text-primary">Forgot password?</a>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill">Sign In</button>
             </form>
 
-            <div class="text-center mt-3">
-                <a href="{{ route('studentAuth.forgotPassword') }}">Forgot Password?</a>
-            </div>
-            <div class="text-center mt-2">
-                Don't have an account? <a href="{{ route('studentAuth.register') }}">Register here</a>
+            <div class="text-center mt-4 pt-3 border-top">
+                <a href="{{ route('studentAuth.register') }}" class="btn btn-outline-secondary w-100 py-2 rounded-pill">Create an Account</a>
             </div>
         </div>
     </div>

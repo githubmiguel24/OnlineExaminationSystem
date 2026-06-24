@@ -2,44 +2,55 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentExamController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QuestionBankController;
+use Illuminate\Support\Facades\Route;
 
-// Student auth routes
+// Landing Page
 Route::get('/', [AuthController::class, 'showWelcome'])->name('welcome');
-Route::group(['prefix' => 'user'], function () {
 
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('studentAuth.register');
-    Route::post('/register', [AuthController::class, 'register'])->name('studentAuth.register.submit');
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('studentAuth.login');
-    Route::post('/login', [AuthController::class, 'login'])->name('studentAuth.login.submit');
-    Route::get('/forgot-password', [authController::class, 'showForgotPassword'])->name('studentAuth.forgotPassword');
+// STUDENT ROUTES
+Route::group(['prefix' => 'student'], function () {
+    Route::get('/register', [AuthController::class, 'showStudentRegister'])->name('studentAuth.register');
+    Route::post('/register', [AuthController::class, 'studentRegister'])->name('studentAuth.register.submit');
+    
+    Route::get('/login', [AuthController::class, 'showStudentLogin'])->name('studentAuth.login');
+    Route::post('/login', [AuthController::class, 'studentLogin'])->name('studentAuth.login.submit');
+    
+    Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('studentAuth.forgotPassword');
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('studentAuth.forgotPassword.submit');
 
     Route::group(['middleware' => 'check.student.auth'], function () {
-        Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('studentAuth.dashboard');
-        Route::post('/logout', [AuthController::class, 'logout'])->name('studentAuth.logout');
+        Route::get('/dashboard', [AuthController::class, 'studentDashboard'])->name('studentAuth.dashboard');
+        Route::post('/logout', [AuthController::class, 'studentLogout'])->name('studentAuth.logout');
     });
 });
 
-// Student exam routes (login required)
 Route::group(['prefix' => 'student-exam', 'middleware' => 'check.student.auth'], function () {
-
     Route::get('/', [StudentExamController::class, 'examList'])->name('studentExam.list');
     Route::get('/{examId}/instructions', [StudentExamController::class, 'examInstructions'])->where('examId', '[0-9]+')->name('studentExam.instructions');
     Route::get('/{examId}/start', [StudentExamController::class, 'startExam'])->where('examId', '[0-9]+')->name('studentExam.start');
     Route::post('/{examId}/submit', [StudentExamController::class, 'submitExam'])->where('examId', '[0-9]+')->name('studentExam.submit');
     Route::get('/{examId}/success', [StudentExamController::class, 'submitSuccess'])->where('examId', '[0-9]+')->name('studentExam.success');
-
 });
 
-Route::group(['prefix' => 'question-bank'], function() {
-    // View the bank dashboard & handle category search/filtering
-    Route::get('/', [QuestionBankController::class, 'index'])->name('questions.index');
+// TEACHER ROUTES
+Route::group(['prefix' => 'teacher'], function () {
+    Route::get('/register', [AuthController::class, 'showTeacherRegister'])->name('teacherAuth.register');
+    Route::post('/register', [AuthController::class, 'teacherRegister'])->name('teacherAuth.register.submit');
     
-    // Add a question
-    Route::post('/store', [QuestionBankController::class, 'store'])->name('questions.store');
-    
-    // Delete a question
-    Route::delete('/delete/{id}', [QuestionBankController::class, 'destroy'])->name('questions.delete');
+    Route::get('/login', [AuthController::class, 'showTeacherLogin'])->name('teacherAuth.login');
+    Route::post('/login', [AuthController::class, 'teacherLogin'])->name('teacherAuth.login.submit');
+
+    // Add a check.teacher.auth middleware later just like your student one
+    Route::group(['middleware' => 'check.teacher.auth'], function () {
+        Route::get('/dashboard', [AuthController::class, 'teacherDashboard'])->name('teacherAuth.dashboard');
+        Route::post('/logout', [AuthController::class, 'teacherLogout'])->name('teacherAuth.logout');
+        
+        // Question Bank Routes for Teachers
+        Route::group(['prefix' => 'question-bank'], function() {
+            Route::get('/', [QuestionBankController::class, 'index'])->name('questions.index');
+            Route::post('/store', [QuestionBankController::class, 'store'])->name('questions.store');
+            Route::delete('/delete/{id}', [QuestionBankController::class, 'destroy'])->name('questions.delete');
+        });
+    });
 });
