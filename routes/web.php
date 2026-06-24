@@ -23,6 +23,8 @@ Route::group(['prefix' => 'student'], function () {
     Route::group(['middleware' => 'check.student.auth'], function () {
         Route::get('/dashboard', [AuthController::class, 'studentDashboard'])->name('studentAuth.dashboard');
         Route::post('/logout', [AuthController::class, 'studentLogout'])->name('studentAuth.logout');
+        Route::get('/results', [AuthController::class, 'studentResults'])->name('student.results');
+        Route::get('/results/{take_id}', [AuthController::class, 'studentResultsShow'])->name('student.results.show');
     });
 });
 
@@ -32,6 +34,7 @@ Route::group(['prefix' => 'student-exam', 'middleware' => 'check.student.auth'],
     Route::get('/{examId}/start', [StudentExamController::class, 'startExam'])->where('examId', '[0-9]+')->name('studentExam.start');
     Route::post('/{examId}/submit', [StudentExamController::class, 'submitExam'])->where('examId', '[0-9]+')->name('studentExam.submit');
     Route::get('/{examId}/success', [StudentExamController::class, 'submitSuccess'])->where('examId', '[0-9]+')->name('studentExam.success');
+    Route::post('/exam/by-code', [StudentExamController::class, 'startByCode'])->name('student.exam.by-code');
 });
 
 // TEACHER ROUTES
@@ -58,6 +61,11 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::group(['prefix' => 'question-bank'], function() {
             Route::get('/create', [QuestionBankController::class, 'create'])->name('questions.create');
             Route::post('/store', [QuestionBankController::class, 'store'])->name('questions.store');
+        
+        Route::get('/results', [AuthController::class, 'teacherResultsIndex'])->name('teacher.results.index');
+        Route::get('/exams/{exam}/results', [AuthController::class, 'teacherResults'])->name('teacher.results');
+        Route::get('/results/{take}', [AuthController::class, 'teacherStudentResult'])->name('teacher.student.result');
+        
         });
         
     });
