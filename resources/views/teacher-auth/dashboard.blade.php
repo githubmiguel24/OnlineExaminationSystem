@@ -136,9 +136,8 @@
                                             <tr>
                                                 <th>Exam Title</th>
                                                 <th>Subject</th>
-                                                <th>Questions</th>
-                                                <th>Takers</th>
-                                                <th>Duration</th>
+                                                <th>Start Date & Time</th>
+                                                <th>End Date & Time</th>
                                                 <th>Status</th>
                                                 <th></th>
                                             </tr>
@@ -156,27 +155,35 @@
                                                         </div>
                                                     </td>
                                                     <td class="text-muted">{{ $exam->subject_name }}</td>
-                                                    <td><span class="fw-bold text-dark">{{ $exam->question_count }}</span></td>
-                                                    <td class="text-muted">{{ $exam->taker_count }}</td>
-                                                    <td class="text-muted"><i class="bi bi-clock me-1"></i>{{ $exam->duration_minutes }} min</td>
+                                                    <td class="text-muted small">
+                                                        @if($exam->start_date)
+                                                            <i class="bi bi-calendar me-1"></i>{{ \Carbon\Carbon::parse($exam->start_date . ' ' . ($exam->start_time ?? '00:00'))->format('M d, Y h:i A') }}
+                                                        @else
+                                                            <span class="text-muted">Not set</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="text-muted small">
+                                                        @if($exam->end_date)
+                                                            <i class="bi bi-calendar me-1"></i>{{ \Carbon\Carbon::parse($exam->end_date . ' ' . ($exam->end_time ?? '23:59'))->format('M d, Y h:i A') }}
+                                                        @else
+                                                            <span class="text-muted">Not set</span>
+                                                        @endif
+                                                    </td>
                                                     <td>
                                                         <span class="badge bg-{{ $exam->status == 'Published' ? 'success' : 'secondary' }}">
                                                             {{ $exam->status }}
                                                         </span>
                                                     </td>
                                                     <td class="text-end">
-                                                        <a href="{{ route('exams.edit', $exam->exam_id) }}" class="btn btn-sm btn-outline-primary me-1">
-                                                            <i class="bi bi-pencil-square"></i> Edit
+                                                        <a href="{{ route('teacher.results', $exam->exam_id) }}" class="btn btn-sm btn-outline-primary me-1">
+                                                            <i class="bi bi-eye"></i> View Details
                                                         </a>
                                                         <form method="POST" action="{{ route('exams.changeStatus', $exam->exam_id) }}" class="d-inline">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-sm btn-outline-{{ $exam->status == 'Published' ? 'primary' : 'success' }} me-1">
+                                                            <button type="submit" class="btn btn-sm btn-outline-{{ $exam->status == 'Published' ? 'danger' : 'success' }}">
                                                                 {{ $exam->status == 'Published' ? 'Unpublish' : 'Publish' }}
                                                             </button>
                                                         </form>
-                                                        <a href="{{ route('teacher.results', $exam->exam_id) }}" class="btn btn-sm btn-outline-primary">
-                                                            <i class="bi bi-bar-chart"></i> Results
-                                                        </a>
                                                     </td>
                                                 </tr>
                                             @endforeach

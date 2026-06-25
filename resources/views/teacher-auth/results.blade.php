@@ -13,13 +13,17 @@
         </a>
     </div>
     {{-- Top bar --}}
-    <div class="d-flex flex-wrap align-items-center justify-content-between mt-1 ms-3 me-3 mb-2">        <div>
+    <div class="d-flex flex-wrap align-items-center justify-content-between mt-1 ms-3 me-3 mb-2">
+        <div>
             <p class="text-muted">
                 Exam Title: <span class = "fw-bold text-primary"> {{ $exam->exam_title }}</span> <br> Subject: <span class = "fw-bold text-primary"> {{ $exam->subject_name }}</span> <br>
             </p>
         </div>
 
         <div class="d-flex align-items-center gap-2">
+            <a href="{{ route('exams.edit', $exam->exam_id) }}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-pencil-square"></i> Edit Exam
+            </a>
             <form method="GET" action="{{ route('teacher.results', $exam->exam_id) }}" class="d-flex">
                 <div class="input-group">
                     <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
