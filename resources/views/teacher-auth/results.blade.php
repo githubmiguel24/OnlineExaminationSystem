@@ -4,17 +4,16 @@
 
 @section('content')
 <div class="container-fluid py-4">
-    <div class="d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center justify-content-between m-3">
         <div>
             <h1 class="h3 fw-bold">Student Results</h1>
         </div>
-        <a href="{{ route('teacherAuth.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+        <a href="{{ route('teacherAuth.dashboard') }}" class="btn btn-outline-primary btn-sm">
             <i class="bi bi-arrow-left"></i> Back to Dashboard
         </a>
     </div>
     {{-- Top bar --}}
-    <div class="d-flex flex-wrap align-items-center justify-content-between m-3">
-        <div>
+    <div class="d-flex flex-wrap align-items-center justify-content-between mt-1 ms-3 me-3 mb-2">        <div>
             <p class="text-muted">
                 Exam Title: <span class = "fw-bold text-primary"> {{ $exam->exam_title }}</span> <br> Subject: <span class = "fw-bold text-primary"> {{ $exam->subject_name }}</span> <br>
             </p>

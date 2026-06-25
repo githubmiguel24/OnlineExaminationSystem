@@ -44,15 +44,6 @@
                     <h1 class="fw-bold">Welcome back</h1>
                     <h3 class="text-muted">{{ $teacher->full_name }}</h3>
                 </div>
-                <div class="d-flex flex-wrap gap-2">
-                    <form method="GET" action="{{ route('teacherAuth.dashboard') }}" class="d-flex">
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                            <input type="text" name="search" class="form-control border-start-0"
-                                   placeholder="Search exams" value="{{ $search }}" />
-                        </div>
-                    </form>
-                </div>
             </div>
 
             {{-- Statistics Cards --}}
@@ -119,10 +110,19 @@
                                 <h5 class="card-title mb-0">
                                     <i class="bi bi-pencil-square text-primary me-2"></i>Exams
                                 </h5>
-                                <a href="{{ route('exams.create') }}" class="btn btn-sm btn-outline-secondary">
-                                    <i class="bi bi-plus"></i> Create Exam
+                                <a href="{{ route('exams.create') }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-plus"></i> Create Exam 
                                 </a>
                             </div>
+                        <div class="d-flex flex-wrap mb-2 gap-2">
+                            <form method="GET" action="{{ route('teacherAuth.dashboard') }}" class="d-flex">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                                    <input type="text" name="search" class="form-control border-start-0"
+                                        placeholder="Search exams" value="{{ $search }}" />
+                                </div>
+                                </form>
+                        </div>
 
                             @if($exams->isEmpty())
                                 <div class="text-center py-4 text-muted">
@@ -165,7 +165,7 @@
                                                         </span>
                                                     </td>
                                                     <td>
-                                                        <a href="{{ route('teacher.results', $exam->exam_id) }}" class="btn btn-sm btn-outline-secondary">
+                                                        <a href="{{ route('teacher.results', $exam->exam_id) }}" class="btn btn-sm btn-outline-primary">
                                                             <i class="bi bi-bar-chart"></i> Results
                                                         </a>
                                                     </td>

@@ -4,16 +4,16 @@
 
 @section('content')
 <div class="container-fluid py-4">
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="d-flex align-items-center justify-content-between m-3">
         <div>
             <h1 class="h3 fw-bold">Results Overview</h1>
         </div>
-        <a href="{{ route('teacherAuth.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+        <a href="{{ route('teacherAuth.dashboard') }}" class="btn btn-outline-primary btn-sm">
             <i class="bi bi-arrow-left"></i> Back to Dashboard
         </a>
     </div>
 
-    <div class="card border-0 shadow-sm">
+    <div class="card border-1 shadow-sm m-3">
         <div class="card-body">
             @if($exams->isEmpty())
                 <div class="text-center py-5 text-muted">
