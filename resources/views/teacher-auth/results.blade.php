@@ -4,13 +4,19 @@
 
 @section('content')
 <div class="container-fluid py-4">
-    {{-- Top bar --}}
-    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+    <div class="d-flex align-items-center justify-content-between">
         <div>
             <h1 class="h3 fw-bold">Student Results</h1>
+        </div>
+        <a href="{{ route('teacherAuth.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+    {{-- Top bar --}}
+    <div class="d-flex flex-wrap align-items-center justify-content-between m-3">
+        <div>
             <p class="text-muted">
-                {{ $exam->exam_title }} —
-                <span class="text-primary">{{ $exam->subject_name }}</span>
+                Exam Title: <span class = "fw-bold text-primary"> {{ $exam->exam_title }}</span> <br> Subject: <span class = "fw-bold text-primary"> {{ $exam->subject_name }}</span> <br>
             </p>
         </div>
 
@@ -22,16 +28,13 @@
                         placeholder="Search student…" value="{{ request('search') }}" />
                 </div>
             </form>
-            <a href="{{ route('teacherAuth.dashboard') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-arrow-left"></i> Back
-            </a>
         </div>
     </div>
 
     {{-- Stats row --}}
-    <div class="row g-3 mb-4">
+    <div class="row g-1 m-2">
         <div class="col-sm-3">
-            <div class="card h-100 border-0 shadow-sm">
+            <div class="card h-100 border-1 shadow-sm">
                 <div class="card-body d-flex align-items-center">
                     <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-3 me-3">
                         <i class="bi bi-people-fill fs-4"></i>
@@ -44,7 +47,7 @@
             </div>
         </div>
         <div class="col-sm-3">
-            <div class="card h-100 border-0 shadow-sm">
+            <div class="card h-100 border-1 shadow-sm">
                 <div class="card-body d-flex align-items-center">
                     <div class="bg-success bg-opacity-10 text-success rounded-circle p-3 me-3">
                         <i class="bi bi-check-circle-fill fs-4"></i>
@@ -57,7 +60,7 @@
             </div>
         </div>
         <div class="col-sm-3">
-            <div class="card h-100 border-0 shadow-sm">
+            <div class="card h-100 border-1 shadow-sm">
                 <div class="card-body d-flex align-items-center">
                     <div class="bg-danger bg-opacity-10 text-danger rounded-circle p-3 me-3">
                         <i class="bi bi-x-circle-fill fs-4"></i>
@@ -70,7 +73,7 @@
             </div>
         </div>
         <div class="col-sm-3">
-            <div class="card h-100 border-0 shadow-sm">
+            <div class="card h-100 border-1 shadow-sm">
                 <div class="card-body d-flex align-items-center">
                     <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-3 me-3">
                         <i class="bi bi-percent fs-4"></i>
@@ -143,12 +146,6 @@
                 </div>
             @endif
         </div>
-    </div>
-
-    <div class="mt-3 text-start">
-        <a href="{{ route('teacherAuth.dashboard') }}" class="text-decoration-none text-muted">
-            <i class="bi bi-arrow-left"></i> Back to Dashboard
-        </a>
     </div>
 
 </div>
