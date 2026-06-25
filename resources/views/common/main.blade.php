@@ -11,7 +11,9 @@
     
     @include ('common.header')
     
-    @yield('content')
+    <main class="flex-grow-1">
+        @yield('content')
+    </main>
     
     @include ('common.footer')
 
