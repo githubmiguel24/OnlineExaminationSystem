@@ -55,7 +55,7 @@ class AuthController extends Controller
 
         $student = DB::table('users_table')->where('email', $request->email)->first();
 
-        if (!$student || !Hash::check($request->password, $student->password) || $student->role_id != 2) {
+        if (!$student || !Hash::check($request->password, $student->password) || $student->role_id != 1) {
             return back()->withErrors(['email' => 'Invalid email, password, or unauthorized portal access.'])->withInput($request->only('email'));
         }
 
@@ -141,7 +141,7 @@ class AuthController extends Controller
 
         $teacher = DB::table('users_table')->where('email', $request->email)->first();
 
-        if (!$teacher || !Hash::check($request->password, $teacher->password) || $teacher->role_id != 1) {
+        if (!$teacher || !Hash::check($request->password, $teacher->password) || $teacher->role_id != 2) {
             return back()->withErrors(['email' => 'Invalid email, password, or unauthorized portal access.'])->withInput($request->only('email'));
         }
 

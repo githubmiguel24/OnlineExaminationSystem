@@ -15,9 +15,9 @@
                            class="nav-link {{ request()->routeIs('teacherAuth.dashboard') ? 'active' : '' }}">
                             <i class="bi bi-grid-1x2-fill me-2"></i> Dashboard
                         </a>
-                        <a href="#examsSection" class="nav-link">
+                        <!-- <a href="#examsSection" class="nav-link">
                             <i class="bi bi-pencil-square me-2"></i> Exams
-                        </a>
+                        </a> -->
                         <a href="{{ route('teacher.results.index') }}"
                         class="nav-link {{ request()->routeIs('teacher.results.index*') ? 'active' : '' }}">
                             <i class="bi bi-bar-chart-fill me-2"></i> View Results
@@ -51,9 +51,6 @@
                                    placeholder="Search exams" value="{{ $search }}" />
                         </div>
                     </form>
-                    <a href="{{ route('exams.create') }}" class="btn btn-outline-primary">
-                        <i class="bi bi-file-earmark-plus"></i> Create Exam
-                    </a>
                 </div>
             </div>
 
