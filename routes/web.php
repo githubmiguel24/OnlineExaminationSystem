@@ -51,11 +51,14 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::get('/dashboard', [AuthController::class, 'teacherDashboard'])->name('teacherAuth.dashboard');
         Route::post('/logout', [AuthController::class, 'teacherLogout'])->name('teacherAuth.logout');
         
-        // PAGE 1: Create the Exam
+        //For Create and edit exam
         Route::get('/exams/create', [ExamController::class, 'create'])->name('exams.create');
         Route::post('/exams/store', [ExamController::class, 'store'])->name('exams.store');
+        Route::get('/exams/{exam_id}/edit', [ExamController::class, 'edit'])->where('exam_id', '[0-9]+')->name('exams.edit');
+        Route::post('/exams/{exam_id}/update', [ExamController::class, 'update'])->where('exam_id', '[0-9]+')->name('exams.update');
+        Route::post('/exams/{exam_id}/change-status', [ExamController::class, 'toggleStatus'])->where('exam_id', '[0-9]+')->name('exams.changeStatus');
 
-        // PAGE 2: Manage Questions for that Exam
+        // Manage Questions for that Exam
         Route::get('/exams/{exam_id}/questions', [ExamController::class, 'manageQuestions'])->name('exams.questions');
         Route::post('/exams/{exam_id}/questions/action', [ExamController::class, 'handleQuestionAction'])->name('exams.questions.action');
         Route::group(['prefix' => 'question-bank'], function() {

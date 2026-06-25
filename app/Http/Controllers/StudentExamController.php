@@ -36,6 +36,39 @@ class StudentExamController extends Controller
             ->first();
     }
 
+    private function getExamStartDateTime($exam)
+    {
+        if (!$exam->start_date) {
+            return null;
+        }
+
+        $startTime = $exam->start_time ?? '00:00';
+        return \Carbon\Carbon::parse($exam->start_date . ' ' . $startTime);
+    }
+
+    private function getExamEndDateTime($exam)
+    {
+        if (!$exam->end_date) {
+            return null;
+        }
+
+        $endTime = $exam->end_time ?? '23:59';
+        return \Carbon\Carbon::parse($exam->end_date . ' ' . $endTime);
+    }
+
+    private function isExamWithinTimeWindow($exam)
+    {
+        $startDateTime = $this->getExamStartDateTime($exam);
+        $endDateTime = $this->getExamEndDateTime($exam);
+
+        if (!$startDateTime || !$endDateTime) {
+            return true;
+        }
+
+        $now = now();
+        return $now->gte($startDateTime) && $now->lte($endDateTime);
+    }
+
     public function examList()
     {
         $studentId = $this->getStudentId();
@@ -64,6 +97,11 @@ class StudentExamController extends Controller
                 ->with('error', 'Exam not found or not published.');
         }
 
+        if (!$this->isExamWithinTimeWindow($exam)) {
+            return redirect()->route('studentExam.list')
+                ->with('error', 'This exam is not available at this time. Please check the exam schedule.');
+        }
+
         $studentId = $this->getStudentId();
         $alreadySubmitted = $this->hasSubmitted($studentId, $examId);
 
@@ -76,6 +114,11 @@ class StudentExamController extends Controller
         if (!$exam) {
             return redirect()->route('studentAuth.dashboard')
                 ->with('error', 'Exam not found or not published.');
+        }
+
+        if (!$this->isExamWithinTimeWindow($exam)) {
+            return redirect()->route('studentExam.list')
+                ->with('error', 'This exam is not available at this time. Please check the exam schedule.');
         }
 
         $studentId = $this->getStudentId();
@@ -108,6 +151,11 @@ class StudentExamController extends Controller
         if (!$exam) {
             return redirect()->route('studentAuth.dashboard')
                 ->with('error', 'Exam not found or not published.');
+        }
+
+        if (!$this->isExamWithinTimeWindow($exam)) {
+            return redirect()->route('studentExam.list')
+                ->with('error', 'The submission window for this exam has closed.');
         }
 
         $studentId = $this->getStudentId();

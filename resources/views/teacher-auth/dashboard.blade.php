@@ -164,7 +164,16 @@
                                                             {{ $exam->status }}
                                                         </span>
                                                     </td>
-                                                    <td>
+                                                    <td class="text-end">
+                                                        <a href="{{ route('exams.edit', $exam->exam_id) }}" class="btn btn-sm btn-outline-primary me-1">
+                                                            <i class="bi bi-pencil-square"></i> Edit
+                                                        </a>
+                                                        <form method="POST" action="{{ route('exams.changeStatus', $exam->exam_id) }}" class="d-inline">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-sm btn-outline-{{ $exam->status == 'Published' ? 'primary' : 'success' }} me-1">
+                                                                {{ $exam->status == 'Published' ? 'Unpublish' : 'Publish' }}
+                                                            </button>
+                                                        </form>
                                                         <a href="{{ route('teacher.results', $exam->exam_id) }}" class="btn btn-sm btn-outline-primary">
                                                             <i class="bi bi-bar-chart"></i> Results
                                                         </a>

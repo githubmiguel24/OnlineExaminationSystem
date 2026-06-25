@@ -19,6 +19,12 @@
                         <p>
                             {{ $exam->description ?? 'No specific instructions provided. Please read each question carefully and select the best answer.' }}
                         </p>
+                        @if($exam->start_date && $exam->end_date)
+                            <p class="mb-0 text-muted small">
+                                Available from <strong>{{ \Carbon\Carbon::parse($exam->start_date . ' ' . ($exam->start_time ?? '00:00'))->format('M d, Y h:i A') }}</strong>
+                                to <strong>{{ \Carbon\Carbon::parse($exam->end_date . ' ' . ($exam->end_time ?? '23:59'))->format('M d, Y h:i A') }}</strong>
+                            </p>
+                        @endif
                     </div>
 
                     <div class="row g-3 mb-4">
@@ -49,7 +55,7 @@
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
                             You have already submitted this exam. You cannot retake it.
                         </div>
-                        <a href="{{ route('studentAuth.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+                        <a href="{{ route('studentAuth.dashboard') }}" class="btn btn-outline-primary"> <- Back to Dashboard</a>
                     @else
                         <form method="GET" action="{{ route('studentExam.start', $exam->exam_id) }}">
                             <button type="submit" class="btn btn-primary btn-lg w-100">
@@ -61,12 +67,6 @@
                         </p>
                     @endif
                 </div>
-            </div>
-
-            <div class="mt-3">
-                <a href="{{ route('studentAuth.dashboard') }}" class="text-decoration-none text-muted">
-                    <i class="bi bi-arrow-left"></i> Back to Dashboard
-                </a>
             </div>
         </div>
     </div>
