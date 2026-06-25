@@ -40,6 +40,9 @@
                     <label class="form-label fw-semibold text-muted small">Password</label>
                     <input type="password" name="password" class="form-control bg-light border-0 py-2" placeholder="Enter your password" required>
                 </div>
+                <div class="text-end mb-4">
+                    <a href="{{ route('teacherAuth.forgotPassword') }}" class="text-decoration-none text-primary small fw-semibold">Forgot password?</a>
+                </div>
                 <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill fw-bold">Sign In</button>
             </form>
             

@@ -64,13 +64,14 @@
                             <div class="mt-3 p-3 bg-light rounded border d-flex justify-content-between align-items-center gap-2">
                                 <form action="{{ route('subjects.update', $currentSubject->subject_id) }}" method="POST" class="d-flex gap-2 flex-grow-1">
                                     @csrf
+                                    @method('PUT')
                                     <input type="text" name="name" class="form-control form-control-sm" value="{{ $currentSubject->subject_displayname }}" required>
-                                    <button type="submit" class="btn btn-sm btn-outline-warning text-nowrap">Rename</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary text-nowrap">Rename</button>
                                 </form>
                                 
                                 <form action="{{ route('subjects.delete', $currentSubject->subject_id) }}" method="POST" onsubmit="return confirm('Delete this subject permanently?');" class="m-0">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
                                 </form>
                             </div>
                         @endif
@@ -81,7 +82,7 @@
                                 @csrf
                                 <div class="input-group">
                                     <input type="text" name="name" class="form-control" placeholder="e.g., Computer Science 101" required>
-                                    <button type="submit" class="btn btn-success fw-bold"><i class="bi bi-plus-lg"></i> Create</button>
+                                    <button type="submit" class="btn btn-primary fw-bold"><i class="bi bi-plus-lg"></i> Create</button>
                                 </div>
                             </form>
                         </div>

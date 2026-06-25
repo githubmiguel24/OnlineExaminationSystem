@@ -99,6 +99,38 @@ class AuthController extends Controller
         return redirect()->route('studentAuth.login')->with('success', 'Password reset. Please log in.');
     }
 
+    public function showTeacherForgotPassword()
+    {
+        return view('teacher-auth.forgot-password');
+    }
+
+    public function teacherForgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
+        ]);
+
+        $teacher = DB::table('users_table')
+            ->where('email', $request->email)
+            ->where('role_id', 2)
+            ->first();
+
+        if (!$teacher) {
+            return back()->withErrors(['email' => 'No matching teacher account found.'])
+                        ->withInput($request->only('email'));
+        }
+
+        DB::table('users_table')
+            ->where('user_id', $teacher->user_id)
+            ->update([
+                'password' => Hash::make($request->password),
+            ]);
+
+        return redirect()->route('teacherAuth.login')
+                        ->with('success', 'Password reset successfully. Please log in.');
+    }
+
     //TEACHER LOGIN & REGISTER
     public function showTeacherRegister()
     {
@@ -158,98 +190,90 @@ class AuthController extends Controller
     }
 
     public function teacherDashboard(Request $request)
-{
-    $teacherSession = session('teacher');
+    {
+        $teacherSession = session('teacher');
 
-    if (!$teacherSession) {
-        return redirect()->route('teacherAuth.login')
-            ->withErrors(['login' => 'Please login first.']);
-    }
+        if (!$teacherSession) {
+            return redirect()->route('teacherAuth.login')
+                ->withErrors(['login' => 'Please login first.']);
+        }
 
-    $teacherId = $teacherSession['user_id'];
-    $search = $request->input('search', '');
+        $teacherId = $teacherSession['user_id'];
+        $search = $request->input('search', '');
 
-    $teacher = DB::table('users_table')
-        ->where('user_id', $teacherId)
-        ->first();
-
-    $exams = DB::table('exams_table as e')
-        ->join('subjects_table as s', 's.subject_id', '=', 'e.subject_id')
-        ->where('e.user_id', $teacherId)
-        ->select(
-            'e.exam_id',
-            'e.title',
-            'e.description',
-            'e.duration_minutes',
-            'e.status',
-            'e.access_code',
-            'e.start_date',
-            'e.end_date',
-            's.subject_displayname as subject_name',
-            DB::raw('(SELECT COUNT(*) FROM exam_question_table eq WHERE eq.exam_id = e.exam_id) as question_count'),
-            DB::raw('(SELECT COUNT(*) FROM student_exam_table se WHERE se.exam_id = e.exam_id) as taker_count')
-        )
-        ->when($search, function ($query) use ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('e.title', 'like', "%{$search}%")
-                ->orWhere('s.subject_name', 'like', "%{$search}%")
-                ->orWhere('s.subject_displayname', 'like', "%{$search}%");
-            });
-        })
-        ->orderBy('e.exam_id', 'desc')
-        ->get();
-
-    $totalStudents = DB::table('student_exam_table as se')
-        ->join('exams_table as e', 'e.exam_id', '=', 'se.exam_id')
-        ->where('e.user_id', $teacherId)
-        ->distinct()
-        ->count('se.student_id');
-
-    $totalExams = DB::table('exams_table')
-        ->where('user_id', $teacherId)
-        ->count();
-
-    $totalSubjects = DB::table('exams_table')
-        ->where('user_id', $teacherId)
-        ->distinct()
-        ->count('subject_id');
-
-    // ==========================================================
-    // NEW: SUBJECT-DRIVEN QUESTION BANK SYSTEM DATA INTEGRATION
-    // ==========================================================
-    
-    // 1. Fetch all subjects matching your database table naming convention
-    $subjectsList = DB::table('subjects_table')->get();
-
-    // 2. Read the currently active workspace subject selection parameter
-    $selectedSubjectId = $request->input('subject_id');
-    $questions = collect(); 
-    $currentSubject = null;
-
-    if ($selectedSubjectId) {
-        $currentSubject = DB::table('subjects_table')
-            ->where('subject_id', $selectedSubjectId)
+        $teacher = DB::table('users_table')
+            ->where('user_id', $teacherId)
             ->first();
-            
-        // 3. Fetch all questions connected to this specific subject scope
-        $questions = DB::table('questions_table') // Make sure this matches your exact questions table name
-            ->where('subject_id', $selectedSubjectId)
-            ->get();
-    }
 
-    return view('teacher-auth.dashboard', compact(
-        'teacher',
-        'exams',
-        'totalStudents',
-        'totalExams',
-        'totalSubjects',
-        'search',
-        // New variables sent out seamlessly to the view layout engine
-        'subjectsList',
-        'questions',
-        'selectedSubjectId',
-        'currentSubject'
-    ));
+        $exams = DB::table('exams_table as e')
+            ->join('subjects_table as s', 's.subject_id', '=', 'e.subject_id')
+            ->where('e.user_id', $teacherId)
+            ->select(
+                'e.exam_id',
+                'e.title',
+                'e.description',
+                'e.duration_minutes',
+                'e.status',
+                'e.access_code',
+                'e.start_date',
+                'e.end_date',
+                's.subject_displayname as subject_name',
+                DB::raw('(SELECT COUNT(*) FROM exam_question_table eq WHERE eq.exam_id = e.exam_id) as question_count'),
+                DB::raw('(SELECT COUNT(*) FROM student_exam_table se WHERE se.exam_id = e.exam_id) as taker_count')
+            )
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('e.title', 'like', "%{$search}%")
+                    ->orWhere('s.subject_name', 'like', "%{$search}%")
+                    ->orWhere('s.subject_displayname', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('e.exam_id', 'desc')
+            ->get();
+
+        $totalStudents = DB::table('student_exam_table as se')
+            ->join('exams_table as e', 'e.exam_id', '=', 'se.exam_id')
+            ->where('e.user_id', $teacherId)
+            ->distinct()
+            ->count('se.student_id');
+
+        $totalExams = DB::table('exams_table')
+            ->where('user_id', $teacherId)
+            ->count();
+
+        $totalSubjects = DB::table('exams_table')
+            ->where('user_id', $teacherId)
+            ->distinct()
+            ->count('subject_id');
+
+        $subjectsList = DB::table('subjects_table')->get();
+
+        $selectedSubjectId = $request->input('subject_id');
+        $questions = collect(); 
+        $currentSubject = null;
+
+        if ($selectedSubjectId) {
+            $currentSubject = DB::table('subjects_table')
+                ->where('subject_id', $selectedSubjectId)
+                ->first();
+                
+            $questions = DB::table('questions_table') 
+                ->where('subject_id', $selectedSubjectId)
+                ->get();
+        }
+
+        return view('teacher-auth.dashboard', compact(
+            'teacher',
+            'exams',
+            'totalStudents',
+            'totalExams',
+            'totalSubjects',
+            'search',
+            'subjectsList',
+            'questions',
+            'selectedSubjectId',
+            'currentSubject'
+        ));
     }
 
     public function studentDashboard(Request $request)
@@ -267,7 +291,6 @@ class AuthController extends Controller
             ->where('user_id', $studentId)
             ->first();
 
-        // Fetch all published exams with date/time fields
         $allPublishedExams = DB::table('exams_table as e')
             ->join('subjects_table as s', 's.subject_id', '=', 'e.subject_id')
             ->where('e.status', 'Published')
@@ -480,6 +503,7 @@ class AuthController extends Controller
         return view('student-auth.result-detail', compact('result', 'questions'));
     }
 
+
     public function teacherResults(Request $request, $examId)
     {
         $teacher = Session::get('teacher');
@@ -540,6 +564,7 @@ class AuthController extends Controller
 
             return view('teacher-auth.results', compact('exam', 'results', 'search', 'passCount', 'failCount', 'avgScore'));    
         }
+
 
     public function teacherStudentResult($takeId)
     {
@@ -646,7 +671,9 @@ class AuthController extends Controller
                 DB::raw('COUNT(DISTINCT se.take_id) as takers'),
                 DB::raw('AVG(se.score) as avg_score'),
                 DB::raw('SUM(CASE WHEN se.status = "Passed" THEN 1 ELSE 0 END) as passed'),
-                DB::raw('COUNT(se.take_id) as total_attempts')
+                DB::raw('COUNT(se.take_id) as total_attempts'),
+                DB::raw('(SELECT COUNT(*) FROM exam_question_table WHERE exam_id = e.exam_id) as total_questions')
+
             )
             ->groupBy('e.exam_id', 'e.title', 'e.description', 's.subject_displayname')
             ->orderBy('e.exam_id', 'desc')
@@ -723,5 +750,7 @@ class AuthController extends Controller
         return redirect()->route('student.profile.edit')
             ->with('success', 'Profile updated successfully!');
     }
+
+    
 
 }

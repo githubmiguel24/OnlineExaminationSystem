@@ -48,6 +48,9 @@ Route::group(['prefix' => 'teacher'], function () {
     Route::get('/login', [AuthController::class, 'showTeacherLogin'])->name('teacherAuth.login');
     Route::post('/login', [AuthController::class, 'teacherLogin'])->name('teacherAuth.login.submit');
 
+    Route::get('/forgot-password', [AuthController::class, 'showTeacherForgotPassword'])->name('teacherAuth.forgotPassword');
+    Route::post('/forgot-password', [AuthController::class, 'teacherForgotPassword'])->name('teacherAuth.forgotPassword.submit');
+
     Route::group(['middleware' => 'check.teacher.auth'], function () {
         
         Route::get('/dashboard', [AuthController::class, 'teacherDashboard'])->name('teacherAuth.dashboard');
@@ -64,14 +67,14 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::get('/exams/{exam_id}/questions', [ExamController::class, 'manageQuestions'])->name('exams.questions');
         Route::post('/exams/{exam_id}/questions/action', [ExamController::class, 'handleQuestionAction'])->name('exams.questions.action');
         Route::group(['prefix' => 'question-bank'], function() {
-            Route::get('/create', [QuestionBankController::class, 'create'])->name('questions.create');
+            Route::get('/', [QuestionBankController::class, 'create'])->name('questions.create');
             Route::post('/store', [QuestionBankController::class, 'store'])->name('questions.store');
-            Route::delete('/delete/{id}', [QuestionBankController::class, 'destroy'])->name('questions.delete');
-            // Subject Management (CRUD)
+            Route::delete('/{id}', [QuestionBankController::class, 'destroy'])->name('questions.delete');
             Route::post('/subjects/store', [QuestionBankController::class, 'storeSubject'])->name('subjects.store');
-            Route::post('/subjects/{id}/update', [QuestionBankController::class, 'updateSubject'])->name('subjects.update');
-            Route::delete('/subjects/{id}/delete', [QuestionBankController::class, 'destroySubject'])->name('subjects.delete');
-    
+            Route::post('/subjects/{id}', [QuestionBankController::class, 'updateSubject'])->name('subjects.update');
+            Route::put('/subjects/{id}', [QuestionBankController::class, 'updateSubject'])->name('subjects.update');
+            Route::delete('/subjects/{id}', [QuestionBankController::class, 'destroySubject'])->name('subjects.delete');
+
             Route::get('/results', [AuthController::class, 'teacherResultsIndex'])->name('teacher.results.index');
             Route::get('/exams/{exam}/results', [AuthController::class, 'teacherResults'])->name('teacher.results');
             Route::get('/results/{take}', [AuthController::class, 'teacherStudentResult'])->name('teacher.student.result');

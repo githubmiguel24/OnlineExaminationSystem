@@ -55,7 +55,7 @@
                                             <span class="fw-bold small">{{ $exam->pass_rate }}%</span>
                                         </div>
                                     </td>
-                                    <td>{{ $exam->avg_score }}/{{ $exam->total_attempts > 0 ? '?' : 'N/A' }}</td>
+                                    <td>{{ $exam->avg_score }}/{{ $exam->total_questions > 0 ? $exam->total_questions : 'N/A' }}</td>
                                     <td>
                                         <a href="{{ route('teacher.results', $exam->exam_id) }}" class="btn btn-sm btn-outline-primary">
                                             <i class="bi bi-bar-chart"></i> View Details
