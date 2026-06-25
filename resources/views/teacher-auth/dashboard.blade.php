@@ -7,32 +7,36 @@
     <div class="row">
 
         {{-- Sidebar --}}
-        <div class="col-lg-2 col-md-3 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-3 d-flex flex-column h-100">
-                    <nav class="nav flex-column nav-pills flex-grow-1">
-                        <a href="{{ route('teacherAuth.dashboard') }}"
-                           class="nav-link {{ request()->routeIs('teacherAuth.dashboard') ? 'active' : '' }}">
-                            <i class="bi bi-grid-1x2-fill me-2"></i> Dashboard
-                        </a>
-                        <!-- <a href="#examsSection" class="nav-link">
-                            <i class="bi bi-pencil-square me-2"></i> Exams
-                        </a> -->
-                        <a href="{{ route('teacher.results.index') }}"
-                        class="nav-link {{ request()->routeIs('teacher.results.index*') ? 'active' : '' }}">
-                            <i class="bi bi-bar-chart-fill me-2"></i> View Results
-                        </a>
-                    </nav>
-                    <form method="POST" action="{{ route('teacherAuth.logout') }}" class="mt-auto m-0">
-                        @csrf
-                        <button type="submit"
-                            class="nav-link w-100 text-start border-0 bg-transparent text-danger px-3">
-                            <i class="bi bi-box-arrow-right me-2"></i> Logout
-                        </button>
-                    </form>
+            <div class="col-lg-2 col-md-3 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body p-3 d-flex flex-column h-100">
+                        <nav class="nav flex-column nav-pills flex-grow-1">
+                            <a href="{{ route('teacherAuth.dashboard') }}"
+                            class="nav-link {{ request()->routeIs('teacherAuth.dashboard') ? 'active' : '' }}">
+                                <i class="bi bi-grid-1x2-fill me-2"></i> Dashboard
+                            </a>
+                            
+                            {{-- NEW: Dedicated Question Bank Link --}}
+                            <a href="{{ route('questions.create') }}"
+                            class="nav-link {{ request()->routeIs('questions.*') ? 'active' : '' }}">
+                                <i class="bi bi-folder2-open me-2"></i> Question Bank
+                            </a>
+
+                            <a href="{{ route('teacher.results.index') }}"
+                            class="nav-link {{ request()->routeIs('teacher.results.index*') ? 'active' : '' }}">
+                                <i class="bi bi-bar-chart-fill me-2"></i> View Results
+                            </a>
+                        </nav>
+                        <form method="POST" action="{{ route('teacherAuth.logout') }}" class="mt-auto m-0">
+                            @csrf
+                            <button type="submit"
+                                class="nav-link w-100 text-start border-0 bg-transparent text-danger px-3">
+                                <i class="bi bi-box-arrow-right me-2"></i> Logout
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
 
         {{-- Main Content --}}
         <div class="col-lg-10 col-md-9">

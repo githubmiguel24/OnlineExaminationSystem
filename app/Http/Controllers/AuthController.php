@@ -158,70 +158,98 @@ class AuthController extends Controller
     }
 
     public function teacherDashboard(Request $request)
-    {
-        $teacherSession = session('teacher');
+{
+    $teacherSession = session('teacher');
 
-        if (!$teacherSession) {
-            return redirect()->route('teacherAuth.login')
-                ->withErrors(['login' => 'Please login first.']);
-        }
+    if (!$teacherSession) {
+        return redirect()->route('teacherAuth.login')
+            ->withErrors(['login' => 'Please login first.']);
+    }
 
-        $teacherId = $teacherSession['user_id'];
-        $search = $request->input('search', '');
+    $teacherId = $teacherSession['user_id'];
+    $search = $request->input('search', '');
 
-        $teacher = DB::table('users_table')
-            ->where('user_id', $teacherId)
+    $teacher = DB::table('users_table')
+        ->where('user_id', $teacherId)
+        ->first();
+
+    $exams = DB::table('exams_table as e')
+        ->join('subjects_table as s', 's.subject_id', '=', 'e.subject_id')
+        ->where('e.user_id', $teacherId)
+        ->select(
+            'e.exam_id',
+            'e.title',
+            'e.description',
+            'e.duration_minutes',
+            'e.status',
+            'e.access_code',
+            'e.start_date',
+            'e.end_date',
+            's.subject_displayname as subject_name',
+            DB::raw('(SELECT COUNT(*) FROM exam_question_table eq WHERE eq.exam_id = e.exam_id) as question_count'),
+            DB::raw('(SELECT COUNT(*) FROM student_exam_table se WHERE se.exam_id = e.exam_id) as taker_count')
+        )
+        ->when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('e.title', 'like', "%{$search}%")
+                ->orWhere('s.subject_name', 'like', "%{$search}%")
+                ->orWhere('s.subject_displayname', 'like', "%{$search}%");
+            });
+        })
+        ->orderBy('e.exam_id', 'desc')
+        ->get();
+
+    $totalStudents = DB::table('student_exam_table as se')
+        ->join('exams_table as e', 'e.exam_id', '=', 'se.exam_id')
+        ->where('e.user_id', $teacherId)
+        ->distinct()
+        ->count('se.student_id');
+
+    $totalExams = DB::table('exams_table')
+        ->where('user_id', $teacherId)
+        ->count();
+
+    $totalSubjects = DB::table('exams_table')
+        ->where('user_id', $teacherId)
+        ->distinct()
+        ->count('subject_id');
+
+    // ==========================================================
+    // NEW: SUBJECT-DRIVEN QUESTION BANK SYSTEM DATA INTEGRATION
+    // ==========================================================
+    
+    // 1. Fetch all subjects matching your database table naming convention
+    $subjectsList = DB::table('subjects_table')->get();
+
+    // 2. Read the currently active workspace subject selection parameter
+    $selectedSubjectId = $request->input('subject_id');
+    $questions = collect(); 
+    $currentSubject = null;
+
+    if ($selectedSubjectId) {
+        $currentSubject = DB::table('subjects_table')
+            ->where('subject_id', $selectedSubjectId)
             ->first();
-
-        $exams = DB::table('exams_table as e')
-            ->join('subjects_table as s', 's.subject_id', '=', 'e.subject_id')
-            ->where('e.user_id', $teacherId)
-            ->select(
-                'e.exam_id',
-                'e.title',
-                'e.description',
-                'e.duration_minutes',
-                'e.status',
-                'e.access_code',
-                'e.start_date',
-                'e.end_date',
-                's.subject_displayname as subject_name',
-                DB::raw('(SELECT COUNT(*) FROM exam_question_table eq WHERE eq.exam_id = e.exam_id) as question_count'),
-                DB::raw('(SELECT COUNT(*) FROM student_exam_table se WHERE se.exam_id = e.exam_id) as taker_count')
-            )
-            ->when($search, function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('e.title', 'like', "%{$search}%")
-                    ->orWhere('s.subject_name', 'like', "%{$search}%")
-                    ->orWhere('s.subject_displayname', 'like', "%{$search}%");
-                });
-            })
-            ->orderBy('e.exam_id', 'desc')
+            
+        // 3. Fetch all questions connected to this specific subject scope
+        $questions = DB::table('questions_table') // Make sure this matches your exact questions table name
+            ->where('subject_id', $selectedSubjectId)
             ->get();
+    }
 
-        $totalStudents = DB::table('student_exam_table as se')
-            ->join('exams_table as e', 'e.exam_id', '=', 'se.exam_id')
-            ->where('e.user_id', $teacherId)
-            ->distinct()
-            ->count('se.student_id');
-
-        $totalExams = DB::table('exams_table')
-            ->where('user_id', $teacherId)
-            ->count();
-
-        $totalSubjects = DB::table('exams_table')
-            ->where('user_id', $teacherId)
-            ->distinct()
-            ->count('subject_id');
-
-        return view('teacher-auth.dashboard', compact(
-            'teacher',
-            'exams',
-            'totalStudents',
-            'totalExams',
-            'totalSubjects',
-            'search'
-        ));
+    return view('teacher-auth.dashboard', compact(
+        'teacher',
+        'exams',
+        'totalStudents',
+        'totalExams',
+        'totalSubjects',
+        'search',
+        // New variables sent out seamlessly to the view layout engine
+        'subjectsList',
+        'questions',
+        'selectedSubjectId',
+        'currentSubject'
+    ));
     }
 
     public function studentDashboard(Request $request)
