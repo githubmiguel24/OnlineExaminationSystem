@@ -23,9 +23,10 @@
                             <i class="bi bi-bar-chart-fill me-2"></i> View Results
                         </a>
                     </nav>
-                    <form method="POST" action="{{ route('teacherAuth.logout') }}" class="mt-auto">
+                    <form method="POST" action="{{ route('teacherAuth.logout') }}" class="mt-auto m-0">
                         @csrf
-                        <button type="submit" class="nav-link w-100 text-start border-0 bg-transparent">
+                        <button type="submit"
+                            class="nav-link w-100 text-start border-0 bg-transparent text-danger px-3">
                             <i class="bi bi-box-arrow-right me-2"></i> Logout
                         </button>
                     </form>

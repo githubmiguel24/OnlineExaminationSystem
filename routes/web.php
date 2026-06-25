@@ -61,11 +61,11 @@ Route::group(['prefix' => 'teacher'], function () {
         Route::group(['prefix' => 'question-bank'], function() {
             Route::get('/create', [QuestionBankController::class, 'create'])->name('questions.create');
             Route::post('/store', [QuestionBankController::class, 'store'])->name('questions.store');
-        
-        Route::get('/results', [AuthController::class, 'teacherResultsIndex'])->name('teacher.results.index');
-        Route::get('/exams/{exam}/results', [AuthController::class, 'teacherResults'])->name('teacher.results');
-        Route::get('/results/{take}', [AuthController::class, 'teacherStudentResult'])->name('teacher.student.result');
-        
+    
+            Route::get('/results', [AuthController::class, 'teacherResultsIndex'])->name('teacher.results.index');
+            Route::get('/exams/{exam}/results', [AuthController::class, 'teacherResults'])->name('teacher.results');
+            Route::get('/results/{take}', [AuthController::class, 'teacherStudentResult'])->name('teacher.student.result');
+            
         });
         
     });
