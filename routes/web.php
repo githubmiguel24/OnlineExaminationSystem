@@ -25,6 +25,8 @@ Route::group(['prefix' => 'student'], function () {
         Route::post('/logout', [AuthController::class, 'studentLogout'])->name('studentAuth.logout');
         Route::get('/results', [AuthController::class, 'studentResults'])->name('student.results');
         Route::get('/results/{take_id}', [AuthController::class, 'studentResultsShow'])->name('student.results.show');
+        Route::get('/profile', [AuthController::class, 'showProfileForm'])->name('student.profile.edit');
+        Route::put('/profile', [AuthController::class, 'updateProfile'])->name('student.profile.update');
     });
 });
 

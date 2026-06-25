@@ -9,6 +9,15 @@
 
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
+
+                    {{-- Back button at the top --}}
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <a href="{{ route('studentAuth.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back to Dashboard
+                        </a>
+                        <span class="badge bg-primary">{{ $exam->status }}</span>
+                    </div>
+
                     <h1 class="h3 fw-bold mb-3">{{ $exam->title }}</h1>
                     <p class="text-muted">{{ $exam->subject_displayname ?? $exam->subject_name ?? 'Subject' }}</p>
 
@@ -55,7 +64,9 @@
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
                             You have already submitted this exam. You cannot retake it.
                         </div>
-                        <a href="{{ route('studentAuth.dashboard') }}" class="btn btn-outline-primary"> <- Back to Dashboard</a>
+                        <a href="{{ route('studentAuth.dashboard') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-left"></i> Back to Dashboard
+                        </a>
                     @else
                         <form method="GET" action="{{ route('studentExam.start', $exam->exam_id) }}">
                             <button type="submit" class="btn btn-primary btn-lg w-100">
@@ -66,6 +77,14 @@
                             Once started, you must complete the exam within the time limit.
                         </p>
                     @endif
+
+                    {{-- Additional bottom back button (optional) --}}
+                    <div class="mt-3 text-center">
+                        <a href="{{ route('studentAuth.dashboard') }}" class="text-decoration-none text-muted small">
+                            <i class="bi bi-arrow-left"></i> Return to Dashboard
+                        </a>
+                    </div>
+
                 </div>
             </div>
         </div>

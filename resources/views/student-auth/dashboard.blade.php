@@ -87,13 +87,13 @@
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <div class="d-flex align-items-center justify-content-center rounded bg-warning bg-opacity-10 text-warning me-3" style="width:48px;height:48px;">
-                                    <i class="bi bi-clock-fill fs-2"></i>
+                                <div class="d-flex align-items-center justify-content-center rounded bg-success bg-opacity-10 text-success me-3" style="width:48px;height:48px;">
+                                    <i class="bi bi-play-circle-fill fs-2"></i>
                                 </div>
                                 <div>
-                                    <p class="text-muted small mb-0">Exams Remaining</p>
-                                    <h3 class="fw-bold mb-0">{{ $examsRemaining }}</h3>
-                                    <span class="text-muted small">Unfinished Exams</span>
+                                    <p class="text-muted small mb-0">Ongoing Exams</p>
+                                    <h3 class="fw-bold mb-0">{{ $ongoingExams }}</h3>
+                                    <span class="text-muted small">Available to take now</span>
                                 </div>
                             </div>
                         </div>
@@ -175,7 +175,7 @@
                     </div>
                 </div>
 
-            </div> {{-- /END LEFT COLUMN --}}
+            </div>
 
 
             {{-- RIGHT COLUMN --}}
@@ -201,15 +201,16 @@
                             </div>
                         </a>
 
-                        <!-- Action: Profile  -->
-                        <a href="#" class="d-flex align-items-center gap-3 text-decoration-none p-3 border rounded-3"
-                            onmouseover="this.classList.add('bg-light')"
-                            onmouseout="this.classList.remove('bg-light')">
+                        <!-- Action: Edit Profile  -->
+                        <a href="{{ route('student.profile.edit') }}"
+                        class="d-flex align-items-center gap-3 text-decoration-none p-3 border rounded-3"
+                        onmouseover="this.classList.add('bg-light')"
+                        onmouseout="this.classList.remove('bg-light')">
                             <div class="d-flex align-items-center justify-content-center rounded bg-primary bg-opacity-10 text-primary" style="width:36px;height:36px;">
                                 <i class="bi bi-person-fill"></i>
                             </div>
                             <div>
-                                <p class="fw-bold text-dark mb-0">My Profile</p>
+                                <p class="fw-bold text-dark mb-0">Edit Profile</p>
                                 <p class="text-muted small mb-0">Manage account settings</p>
                             </div>
                         </a>
@@ -217,7 +218,7 @@
                     </div>
                 </div>
 
-            </div> {{-- /END RIGHT COLUMN --}}
+            </div>
 
         </div>
         </div>

@@ -267,6 +267,7 @@ class AuthController extends Controller
             ->where('user_id', $studentId)
             ->first();
 
+        // Fetch all published exams with date/time fields
         $allPublishedExams = DB::table('exams_table as e')
             ->join('subjects_table as s', 's.subject_id', '=', 'e.subject_id')
             ->where('e.status', 'Published')
@@ -276,6 +277,10 @@ class AuthController extends Controller
                 'e.description',
                 'e.duration_minutes',
                 'e.access_code',
+                'e.start_date',
+                'e.start_time',
+                'e.end_date',
+                'e.end_time',
                 's.subject_displayname as subject_name'
             )
             ->when($search, function ($query) use ($search) {
@@ -293,6 +298,13 @@ class AuthController extends Controller
         $availableExams = $allPublishedExams->filter(function ($exam) use ($takenExamIds) {
             return !in_array($exam->exam_id, $takenExamIds);
         })->values();
+
+        $ongoingExams = $availableExams->filter(function ($exam) {
+            return $this->isExamOngoing($exam);
+        })->count();
+
+        $totalExams     = $allPublishedExams->count();
+        $examsTaken     = count($takenExamIds);
 
         $recentResults = DB::table('student_exam_table as se')
             ->join('exams_table as e', 'e.exam_id', '=', 'se.exam_id')
@@ -323,10 +335,6 @@ class AuthController extends Controller
                 return $row;
             });
 
-        $totalExams     = $allPublishedExams->count();
-        $examsTaken     = count($takenExamIds);
-        $examsRemaining = max(0, $totalExams - $examsTaken);
-
         return view('student-auth.dashboard', compact(
             'student',
             'availableExams',
@@ -334,8 +342,16 @@ class AuthController extends Controller
             'search',
             'totalExams',
             'examsTaken',
-            'examsRemaining'
+            'ongoingExams'
         ));
+    }
+
+    private function isExamOngoing($exam)
+    {
+        $start = \Carbon\Carbon::parse($exam->start_date . ' ' . ($exam->start_time ?? '00:00'));
+        $end   = \Carbon\Carbon::parse($exam->end_date   . ' ' . ($exam->end_time   ?? '23:59'));
+        $now   = now();
+        return $now->gte($start) && $now->lte($end);
     }
 
     public function examByCode(Request $request)
@@ -643,4 +659,69 @@ class AuthController extends Controller
 
         return view('teacher-auth.results-index', compact('exams'));
     }
+
+    public function showProfileForm()
+    {
+        $student = session('student');
+        if (!$student) {
+            return redirect()->route('studentAuth.login')->withErrors(['login' => 'Please log in first.']);
+        }
+
+        // Cast to object if it's an array
+        if (is_array($student)) {
+            $student = (object) $student;
+        }
+
+        return view('student-auth.profile-edit', compact('student'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $student = session('student');
+        if (!$student) {
+            return redirect()->route('studentAuth.login')->withErrors(['login' => 'Please log in first.']);
+        }
+
+        // Cast to object
+        if (is_array($student)) {
+            $student = (object) $student;
+        }
+
+        $userId = $student->user_id;
+
+        // Validation rules
+        $rules = [
+            'full_name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:255', 'unique:users_table,email,' . $userId . ',user_id'],
+        ];
+
+        if ($request->filled('password')) {
+            $rules['password'] = ['string', 'min:6', 'confirmed'];
+        }
+
+        $request->validate($rules);
+
+        // Prepare update data
+        $data = [
+            'full_name' => $request->full_name,
+            'email' => $request->email,
+        ];
+
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        // Update database
+        DB::table('users_table')
+            ->where('user_id', $userId)
+            ->update($data);
+
+        // Refresh session with updated data
+        $updatedStudent = DB::table('users_table')->where('user_id', $userId)->first();
+        Session::put('student', $updatedStudent);
+
+        return redirect()->route('student.profile.edit')
+            ->with('success', 'Profile updated successfully!');
+    }
+
 }
