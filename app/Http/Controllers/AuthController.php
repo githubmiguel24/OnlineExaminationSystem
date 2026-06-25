@@ -85,7 +85,7 @@ class AuthController extends Controller
 
         $student = DB::table('users_table')
             ->where('email', $request->email)
-            ->where('role_id', 2)
+            ->where('role_id', 1)
             ->first();
 
         if (!$student) {

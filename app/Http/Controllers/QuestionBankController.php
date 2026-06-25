@@ -33,7 +33,7 @@ class QuestionBankController extends Controller
             'D' => $request->choice_d,
         ];
 
-        DB::table('question_table')->insert([
+        DB::table('questions_table')->insert([
             'subject_id' => $request->subject_id,
             'quest_desc' => $request->question_text,
             'quest_choices' => json_encode($choices), // Saves as a JSON string
